@@ -8,12 +8,13 @@ import {
   Th,
   Tr,
   Td,
-  Badge,
+  useDisclosure,
   Button,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { pb } from "../lib/pocketbase";
 import IssuedStatusBadge from "./IssuedStatusBadge";
+import IssueExcursionModal from "./IssueExcursionModal";
 
 export interface PendingExcursion {
   id: string;
@@ -46,6 +47,7 @@ function PendingExcursionsPage() {
   const [pendingExcursions, setPendingExcursions] = useState<
     PendingExcursion[] | null
   >(null);
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   async function issuePendingExcursion(excursion: PendingExcursion) {
     const data = {
@@ -65,7 +67,8 @@ function PendingExcursionsPage() {
       expand: "type",
     });
 
-    const data: PendingExcursion[] = resultList.items.map((v) => ({
+    // TODO: this any type
+    const data: any[] = resultList.items.map((v) => ({
       id: v.id,
       created: v.created,
       expand: v.expand,
@@ -115,7 +118,7 @@ function PendingExcursionsPage() {
                   <Button
                     size="sm"
                     disabled={excursion.issued}
-                    onClick={() => issuePendingExcursion(excursion)}
+                    onClick={onOpen}
                   >
                     Issue
                   </Button>
@@ -125,6 +128,7 @@ function PendingExcursionsPage() {
           </Tbody>
         </Table>
       </TableContainer>
+      <IssueExcursionModal isOpen={isOpen} onClose={onClose} />
     </Container>
   );
 }
